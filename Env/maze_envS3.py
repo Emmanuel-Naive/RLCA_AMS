@@ -3,10 +3,11 @@ Reinforcement learning maze example.
 Writen by Morvan: https://morvanzhou.github.io/tutorials/
 Modified by Weijian: weijiany@stud.ntnu.no
 
+Version: 3 ships, 3 goals and 3 obstacles
 Red rectangle:         ship (explorer)
-Black rectangles:     obstracte
+Black rectangles:      obstacle
 Yellow bin circle:     goal
-All other states:       open sea
+All other states:      open sea
 """
 
 
