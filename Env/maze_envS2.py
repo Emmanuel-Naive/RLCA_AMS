@@ -185,7 +185,7 @@ def update():
             ship1s, r1, done1 = env.step1(a)
             b = 2
             ship2s, r2, done2 = env.step2(b)
-            if done1 & done2:
+            if done1 or done2:
                 break
 
 if __name__ == '__main__':
