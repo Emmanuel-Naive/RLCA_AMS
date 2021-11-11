@@ -132,7 +132,7 @@ class Maze(tk.Tk, object):
 
 def update():
     for t in range(10):
-        ship1s = env.reset()
+        env.reset()
         while True:
             env.render()
             a = 1
