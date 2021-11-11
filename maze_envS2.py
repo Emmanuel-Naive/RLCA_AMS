@@ -92,7 +92,7 @@ class Maze(tk.Tk, object):
         # pack all
         self.canvas.pack()
 
-    def reset(self):
+    def reset1(self):
         self.update()
         time.sleep(0.5)
         self.canvas.delete(self.ship1)
@@ -100,15 +100,17 @@ class Maze(tk.Tk, object):
             ship1_center[0] - 15, ship1_center[1] - 15,
             ship1_center[0] + 15, ship1_center[1] + 15,
             fill='yellow')
+        # return observation
+        return self.canvas.coords(self.ship1)
 
+    def reset2(self):
         self.canvas.delete(self.ship2)
         self.ship2 = self.canvas.create_rectangle(
             ship2_center[0] - 15, ship2_center[1] - 15,
             ship2_center[0] + 15, ship2_center[1] + 15,
             fill='green')
-
         # return observation
-        return self.canvas.coords(self.ship1), self.canvas.coords(self.ship2)
+        return self.canvas.coords(self.ship2)
 
     def step1(self, action):
         ship1s = self.canvas.coords(self.ship1)
@@ -142,7 +144,7 @@ class Maze(tk.Tk, object):
         return ship1s_, reward1, done1
 
     def step2(self, action):
-        ship2s = self.canvas.coords(self.ship1)
+        ship2s = self.canvas.coords(self.ship2)
         base_action = np.array([0, 0])
         if action == 0:  # up
             if ship2s[1] > UNIT:
@@ -162,7 +164,7 @@ class Maze(tk.Tk, object):
         if ship2s_ == self.canvas.coords(self.goal2):
             reward2 = 1
             done2 = True
-            ship1s_ = 'terminal'
+            ship2s_ = 'terminal'
         elif ship2s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
             reward2 = -1
             done2 = True
@@ -178,8 +180,8 @@ class Maze(tk.Tk, object):
 
 def update():
     for t in range(10):
-        ship1s = env.reset()
-        ship2s = env.reset()
+        ship1s = env.reset1()
+        ship2s = env.reset2()
         while True:
             env.render()
             a = 1
