@@ -19,8 +19,8 @@ else:
     import tkinter as tk
 
 UNIT = 40       # pixels: distance between 2 points
-MAZE_H = 10     # grid height
-MAZE_W = 10     # grid width
+MAZE_H = 15     # grid height
+MAZE_W = 15     # grid width
 # Map Initialization
 # Be careful to create origin
 # Origin would be located at the upper left corner of the map.
@@ -92,7 +92,7 @@ class Maze(tk.Tk, object):
         # pack all
         self.canvas.pack()
 
-    def reset1(self):
+    def reset(self):
         self.update()
         time.sleep(0.5)
         self.canvas.delete(self.ship1)
@@ -100,17 +100,14 @@ class Maze(tk.Tk, object):
             ship1_center[0] - 15, ship1_center[1] - 15,
             ship1_center[0] + 15, ship1_center[1] + 15,
             fill='yellow')
-        # return observation
-        return self.canvas.coords(self.ship1)
 
-    def reset2(self):
         self.canvas.delete(self.ship2)
         self.ship2 = self.canvas.create_rectangle(
             ship2_center[0] - 15, ship2_center[1] - 15,
             ship2_center[0] + 15, ship2_center[1] + 15,
             fill='green')
         # return observation
-        return self.canvas.coords(self.ship2)
+        return self.canvas.coords(self.ship1),self.canvas.coords(self.ship2)
 
     def step1(self, action):
         ship1s = self.canvas.coords(self.ship1)
@@ -180,8 +177,7 @@ class Maze(tk.Tk, object):
 
 def update():
     for t in range(10):
-        ship1s = env.reset1()
-        ship2s = env.reset2()
+        env.reset()
         while True:
             env.render()
             a = 1
