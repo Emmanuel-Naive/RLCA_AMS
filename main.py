@@ -48,7 +48,7 @@ def update():
             observation2 = observation2_
 
             # break while loop when end of this episode
-            if done1 and done2:
+            if done1 or done2:
                 break
 
     # end of game
