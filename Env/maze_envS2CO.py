@@ -16,6 +16,7 @@ All other states:      open sea
 import numpy as np
 import time
 import sys
+
 if sys.version_info.major == 2:
     import Tkinter as tk
 else:
@@ -29,16 +30,18 @@ MAZE_W = 7     # grid width
 # Origin would be located at the upper left corner of the map.
 # X-axis points to the right
 # Y-axis points down
+
 origin = np.array([20, 20])  # origin[X,Y]
 # obst1_center = origin + np.array([UNIT * 2, UNIT * 2])
 # obst2_center = origin + np.array([UNIT * 6, UNIT * 6])
 ship1_center = origin + np.array([UNIT * 3, 0])
-goal1_center = origin + np.array([UNIT * 3, UNIT * 5])
+goal1_center = origin + np.array([UNIT * 3, UNIT * 6])
 ship2_center = origin + np.array([0, UNIT * 3])
-goal2_center = origin + np.array([UNIT * 5, UNIT * 3])
+goal2_center = origin + np.array([UNIT * 6, UNIT * 3])
 distance1 = (ship1_center[0] - goal1_center[0]) ** 2 + (ship1_center[1] - goal1_center[1]) ** 2
 distance2 = (ship2_center[0] - goal2_center[0]) ** 2 + (ship2_center[1] - goal2_center[1]) ** 2
 dangerdis = 8 * UNIT
+
 class Maze(tk.Tk, object):
     def __init__(self):
         super(Maze, self).__init__()
@@ -111,6 +114,7 @@ class Maze(tk.Tk, object):
             ship2_center[0] - 15, ship2_center[1] - 15,
             ship2_center[0] + 15, ship2_center[1] + 15,
             fill='green')
+
         # return observation
         return self.canvas.coords(self.ship1),self.canvas.coords(self.ship2)
 
@@ -137,7 +141,7 @@ class Maze(tk.Tk, object):
             done1 = True
             ship1s_ = 'terminal'
         elif ship1s_ == self.canvas.coords(self.goal2):
-            reward1 = -1
+            reward1 = -100
             done1 = False
         # elif ship1s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
         #     reward1 = -1
@@ -171,7 +175,7 @@ class Maze(tk.Tk, object):
             done2 = True
             ship2s_ = 'terminal'
         elif ship2s_ == self.canvas.coords(self.goal1):
-            reward2 = -1
+            reward2 = -100
             done2 = False
         # elif ship2s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
         #     reward2 = -1
@@ -225,17 +229,18 @@ class Maze(tk.Tk, object):
             ship2s_center = np.array([ship2s[0] - 15, ship2s[1] + 15])
             sdistance1 = (ship1s_center[0] - goal1_center[0]) ** 2 + (ship1s_center[1] - goal1_center[1]) ** 2
             sdistance2 = (ship2s_center[0] - goal2_center[0]) ** 2 + (ship2s_center[1] - goal2_center[1]) ** 2
-            reward1 += (distance1 - sdistance1) / distance1
-            reward2 += (distance2 - sdistance2) / distance2
+            reward1 += 100 * (distance1 - sdistance1) / distance1
+            reward2 += 100 * (distance2 - sdistance2) / distance2
             return reward1, reward2
+
     def render(self):
         time.sleep(0.1)
         self.update()
 
 def update():
+    time.sleep(5)
     for t in range(10):
         env.reset()
-
         while True:
             env.render()
             a = 1
