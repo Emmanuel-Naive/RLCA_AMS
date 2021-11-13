@@ -32,8 +32,8 @@ MAZE_W = 7     # grid width
 # Y-axis points down
 
 origin = np.array([20, 20])  # origin[X,Y]
-# obst1_center = origin + np.array([UNIT * 2, UNIT * 2])
-# obst2_center = origin + np.array([UNIT * 6, UNIT * 6])
+obst1_center = origin + np.array([UNIT * 2, UNIT * 2])
+obst2_center = origin + np.array([UNIT *2, UNIT * 4])
 ship1_center = origin + np.array([UNIT * 3, 0])
 goal1_center = origin + np.array([UNIT * 3, UNIT * 6])
 ship2_center = origin + np.array([0, UNIT * 3])
@@ -65,15 +65,15 @@ class Maze(tk.Tk, object):
             self.canvas.create_line(x0, y0, x1, y1)
 
         # create obstacles
-        # self.obst1 = self.canvas.create_rectangle(
-        #     obst1_center[0] - 15, obst1_center[1] - 15,
-        #     obst1_center[0] + 15, obst1_center[1] + 15,
-        #     fill='black')
-        #
-        # self.obst2 = self.canvas.create_rectangle(
-        #     obst2_center[0] - 15, obst2_center[1] - 15,
-        #     obst2_center[0] + 15, obst2_center[1] + 15,
-        #     fill='black')
+        self.obst1 = self.canvas.create_rectangle(
+            obst1_center[0] - 15, obst1_center[1] - 15,
+            obst1_center[0] + 15, obst1_center[1] + 15,
+            fill='black')
+        
+        self.obst2 = self.canvas.create_rectangle(
+            obst2_center[0] - 15, obst2_center[1] - 15,
+            obst2_center[0] + 15, obst2_center[1] + 15,
+            fill='black')
 
         # create goals
         self.goal1 = self.canvas.create_oval(
@@ -137,16 +137,16 @@ class Maze(tk.Tk, object):
         ship1s_ = self.canvas.coords(self.ship1)  # next state
         # reward function
         if ship1s_ == self.canvas.coords(self.goal1):
-            reward1 = 100
-            done1 = True
+            reward1 = 10
+            done1 = False
             ship1s_ = 'terminal'
         elif ship1s_ == self.canvas.coords(self.goal2):
-            reward1 = -100
+            reward1 = -10
             done1 = False
-        # elif ship1s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
-        #     reward1 = -1
-        #     done1 = True
-        #     ship1s_ = 'terminal'
+        elif ship1s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
+            reward1 = -10
+            done1 = True
+            ship1s_ = 'terminal'
         else:
             reward1 = 0
             done1 = False
@@ -171,30 +171,34 @@ class Maze(tk.Tk, object):
         ship2s_ = self.canvas.coords(self.ship2)  # next state
 
         if ship2s_ == self.canvas.coords(self.goal2):
-            reward2 = 100
-            done2 = True
+            reward2 = 10
+            done2 = False
             ship2s_ = 'terminal'
         elif ship2s_ == self.canvas.coords(self.goal1):
-            reward2 = -100
+            reward2 = -10
             done2 = False
-        # elif ship2s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
-        #     reward2 = -1
-        #     done2 = True
-        #     ship2s_ = 'terminal'
+        elif ship2s_ in [self.canvas.coords(self.obst1),self.canvas.coords(self.obst2)]:
+            reward2 = -10
+            done2 = True
+            ship2s_ = 'terminal'
         else:
             reward2 = 0
             done2 = False
         return ship2s_, reward2, done2
 
     def checkcollison(self, ship1s, reward1, done1, ship2s, reward2, done2):
-        if ship1s == 'terminal' or ship2s == 'terminal':
+        if ship1s == 'terminal' and ship2s == 'terminal':
+            done1=True
+            done2=True
+            return reward1, done1, reward2, done2
+        elif ship1s == 'terminal' or ship2s == 'terminal':
             return reward1, done1, reward2, done2
         else:
             ship1s_center = np.array([ship1s[0] - 15, ship1s[1] + 15])
             ship2s_center = np.array([ship2s[0] - 15, ship2s[1] + 15])
             if (ship1s_center == ship2s_center).all():
-                reward1 -= 100
-                reward2 -= 100
+                reward1 -= 10
+                reward2 -= 10
                 done1 = True
                 done2 = True
                 return reward1, done1, reward2, done2
@@ -217,20 +221,20 @@ class Maze(tk.Tk, object):
         elif ship1s == 'terminal' and ship2s != 'terminal':
             ship2s_center = np.array([ship2s[0] - 15, ship2s[1] + 15])
             sdistance2 = (ship2s_center[0] - goal2_center[0]) ** 2 + (ship2s_center[1] - goal2_center[1]) ** 2
-            reward2 += (distance2 - sdistance2) / distance2
+            reward2 += 100 * (distance2 - sdistance2) / distance2
             return reward1, reward2
         elif ship2s == 'terminal' and ship1s != 'terminal':
             ship1s_center = np.array([ship1s[0] - 15, ship1s[1] + 15])
             sdistance1 = (ship1s_center[0] - goal1_center[0]) ** 2 + (ship1s_center[1] - goal1_center[1]) ** 2
-            reward1 += (distance1 - sdistance1) / distance1
+            reward1 += 100 *  (distance1 - sdistance1) / distance1
             return reward1, reward2
         else:
             ship1s_center = np.array([ship1s[0] - 15, ship1s[1] + 15])
             ship2s_center = np.array([ship2s[0] - 15, ship2s[1] + 15])
             sdistance1 = (ship1s_center[0] - goal1_center[0]) ** 2 + (ship1s_center[1] - goal1_center[1]) ** 2
             sdistance2 = (ship2s_center[0] - goal2_center[0]) ** 2 + (ship2s_center[1] - goal2_center[1]) ** 2
-            reward1 += 100 * (distance1 - sdistance1) / distance1
-            reward2 += 100 * (distance2 - sdistance2) / distance2
+            reward1 +=  (distance1 - sdistance1) / distance1
+            reward2 +=  (distance2 - sdistance2) / distance2
             return reward1, reward2
 
     def render(self):
