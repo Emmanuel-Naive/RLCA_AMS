@@ -14,9 +14,10 @@ All other states:      open sea
 
 from Env.maze_envS2CO import Maze
 from RL_brain import QLearningTable
-
+import time
 
 def update():
+    time.sleep(5)
     for episode in range(100):
         # initial observation
         observation1 = env.reset()
@@ -37,6 +38,7 @@ def update():
 
             reward1, reward2 = env.checkgoal(observation1_, reward1, observation2_, reward2)
             reward1, done1, reward2, done2 = env.checkcollison(observation1_, reward1, done1, observation2_, reward2, done2)
+
             # RL learn from this transition
             RL.learn(str(observation1), action1, reward1, str(observation1_))
             RL.learn(str(observation2), action2, reward2, str(observation2_))
